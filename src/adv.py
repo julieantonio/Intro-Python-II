@@ -1,6 +1,6 @@
 from room import Room
 from player import Player
-
+from item import Item
 # Declare all the rooms
 
 room = {
@@ -21,6 +21,14 @@ to north. The smell of gold permeates the air."""),
 chamber! Sadly, it has already been completely emptied by
 earlier adventurers. The only exit is to the south."""),
 }
+
+cat = Item('cat', 'A chokin cat named Maceo')
+bow = Item('bow', 'A bow fashioned from yew wood')
+arrows = Item('arrows', 'A quiver of arrows with feathered ends')
+
+room['foyer'].room_inventory.append(cat)
+room['overlook'].room_inventory.append(bow)
+room['overlook'].room_inventory.append(arrows)
 
 
 # Link rooms together
@@ -50,29 +58,60 @@ room['treasure'].s_to = room['narrow']
 # Print an error message if the movement isn't allowed.
 #
 # If the user enters "q", quit the game.
+
+directions = ['n', 'e', 's', 'w']
+
 def adventure_game():
-    name = 'adventurer'
+    name = 'mysterious adventurer'
     player = Player(name, room['outside'])
     print("Wow this is a game do you want to play it")
 
     user_input = int(input("Press [1] to start or [9] to exit "))
 
-    while True:
-        if user_input == 1:
-            name = input("What is your name? ")
-            if name != '':
-                #player.name = 'adventurer'
-                player.name = name
-            #else:
-            print(f"welcome {player.name}")
-            choice = input("what will you do? ")
+    if user_input == 1:
+        name = input("What is your name? ")
+        if name != '':
+            player.name = name
+        print(f"\n Welcome {player.name}. \n Move by entering [N]/[E]/[S]/[W] \n You are {player.current_room.name}. \n {player.current_room.desc}")
+    elif user_input == 9:
+        print('goodbye')
+    while user_input == 1:
+        choice = input("\n what will you do?")
+        if choice.lower() in directions:
+            player.travel(choice.lower())
+
+        elif 'get' in choice:
+            split_string = choice.split()
+            # print(f'Got {split_string[1]}')
+            player.get_item(split_string[1].lower())
+
+        elif 'drop' in choice:
+            split_string = choice.split()
+            player.drop_item(split_string[1].lower())
+
+        elif choice.lower() == 'inventory' or choice.lower() == 'backpack':
+            if player.player_inventory != []:
+                print('You look in your backpack and see:')
+                for x in player.player_inventory:
+                    print(f"{x.name} \n {x.desc}")
+
+            else:
+                print('Your backpack is empty')
             
-            if choice == 'win the game':
-                print('ok then')
-                break
-        
+        elif choice == 'win the game':
+            print('ok, you win')
+            break
+
+        elif choice == '9':
+            print('Goodbye')
+            break
+
         else:
-            print('Invalid input')
+            print(choice)
+            print("I don't recognize that command, please try again")
+        
+    else:
+        print('Invalid input')
 
 adventure_game()
             
